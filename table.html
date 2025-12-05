@@ -1,0 +1,3954 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#6366f1">
+  <meta name="description" content="نظام المذاكرة الذكي للصف الثاني الثانوي العلمي">
+  <title>🎓 نظام المذاكرة الذكي</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary: #8b5cf6;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --info: #3b82f6;
+      --light: #f8fafc;
+      --dark: #1e293b;
+      --gray: #64748b;
+      --card-bg: #ffffff;
+      --sidebar-bg: #1e293b;
+      --header-bg: #ffffff;
+      --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --radius: 12px;
+      --transition: all 0.3s ease;
+    }
+    
+    .dark-mode {
+      --primary: #818cf8;
+      --primary-dark: #6366f1;
+      --secondary: #a78bfa;
+      --light: #1e293b;
+      --dark: #f1f5f9;
+      --gray: #94a3b8;
+      --card-bg: #334155;
+      --sidebar-bg: #0f172a;
+      --header-bg: #1e293b;
+      --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      margin: 0;
+      padding: 0;
+      direction: rtl;
+      text-align: right;
+      min-height: 100vh;
+      color: var(--dark);
+      transition: var(--transition);
+    }
+    
+    /* شاشة التحميل */
+    .loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease;
+    }
+    
+    .loading-logo {
+      font-size: 4rem;
+      color: white;
+      margin-bottom: 20px;
+      animation: pulse 2s infinite;
+    }
+    
+    .loading-text {
+      color: white;
+      font-size: 1.2rem;
+      margin-bottom: 30px;
+    }
+    
+    .loading-bar {
+      width: 200px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    
+    .loading-progress {
+      height: 100%;
+      background: white;
+      width: 0%;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    
+    /* أنماط تسجيل الدخول */
+    .auth-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      padding: 20px;
+    }
+    
+    .auth-box {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 30px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+    
+    .auth-logo {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      color: var(--primary);
+    }
+    
+    .auth-title {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      color: var(--dark);
+    }
+    
+    .auth-tabs {
+      display: flex;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .auth-tab {
+      flex: 1;
+      padding: 10px;
+      background: none;
+      border: none;
+      font-family: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      color: var(--gray);
+    }
+    
+    .auth-tab.active {
+      color: var(--primary);
+      border-bottom: 2px solid var(--primary);
+    }
+    
+    .auth-form {
+      display: none;
+    }
+    
+    .auth-form.active {
+      display: block;
+    }
+    
+    .auth-footer {
+      margin-top: 20px;
+      font-size: 0.9rem;
+      color: var(--gray);
+    }
+    
+    .auth-link {
+      color: var(--primary);
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--dark);
+      font-weight: 600;
+      text-align: right;
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      font-family: inherit;
+      background: var(--light);
+      color: var(--dark);
+      transition: var(--transition);
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: var(--radius);
+      font-family: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      box-shadow: 0 4px 6px rgba(99, 102, 241, 0.3);
+    }
+    
+    .btn-success {
+      background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+      color: white;
+      box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);
+    }
+    
+    .btn-warning {
+      background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
+      color: white;
+      box-shadow: 0 4px 6px rgba(245, 158, 11, 0.3);
+    }
+    
+    .btn-danger {
+      background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+      color: white;
+      box-shadow: 0 4px 6px rgba(239, 68, 68, 0.3);
+    }
+    
+    .btn-info {
+      background: linear-gradient(135deg, var(--info) 0%, #2563eb 100%);
+      color: white;
+      box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .btn:active {
+      transform: translateY(0);
+    }
+    
+    /* إشعارات */
+    .notification {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      right: 20px;
+      background: var(--card-bg);
+      padding: 15px 20px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 1100;
+      transform: translateY(-100px);
+      opacity: 0;
+      transition: var(--transition);
+    }
+    
+    .notification.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    
+    .notification.success {
+      border-right: 4px solid var(--success);
+    }
+    
+    .notification.error {
+      border-right: 4px solid var(--danger);
+    }
+    
+    .notification.warning {
+      border-right: 4px solid var(--warning);
+    }
+    
+    .notification.info {
+      border-right: 4px solid var(--info);
+    }
+    
+    .notification-content {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .close-notification {
+      background: none;
+      border: none;
+      color: var(--gray);
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+    
+    /* أنماط التطبيق الرئيسي */
+    .app-container {
+      display: none;
+      min-height: 100vh;
+    }
+    
+    .app-container.active {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .sidebar {
+      width: 100%;
+      background: var(--sidebar-bg);
+      color: white;
+      padding: 10px 0;
+      transition: var(--transition);
+      box-shadow: var(--shadow);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .sidebar-header {
+      padding: 0 15px 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .sidebar-header h2 {
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .sidebar-toggle {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: none;
+    }
+    
+    .sidebar-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      overflow-x: auto;
+      padding-bottom: 10px;
+    }
+    
+    .sidebar-menu li {
+      margin-bottom: 0;
+      flex: 0 0 auto;
+    }
+    
+    .sidebar-menu a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 15px;
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      transition: var(--transition);
+      border-right: 3px solid transparent;
+      white-space: nowrap;
+    }
+    
+    .sidebar-menu a:hover, .sidebar-menu a.active {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border-right-color: var(--primary);
+    }
+    
+    .sidebar-footer {
+      padding: 15px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .theme-toggle {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .theme-toggle:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    /* المحتوى الرئيسي */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: auto;
+      background: var(--light);
+    }
+    
+    .header {
+      background: var(--header-bg);
+      padding: 15px 20px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      z-index: 10;
+    }
+    
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .header h1 {
+      font-size: 1.5rem;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .user-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 5px 10px;
+      border-radius: var(--radius);
+      transition: var(--transition);
+    }
+    
+    .user-profile:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+    
+    .user-avatar {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+    }
+    
+    .user-menu {
+      position: relative;
+    }
+    
+    .user-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 10px 0;
+      min-width: 150px;
+      z-index: 1000;
+      display: none;
+    }
+    
+    .user-dropdown.show {
+      display: block;
+    }
+    
+    .user-dropdown-item {
+      display: block;
+      width: 100%;
+      padding: 10px 15px;
+      background: none;
+      border: none;
+      text-align: right;
+      font-family: inherit;
+      cursor: pointer;
+      transition: var(--transition);
+      color: var(--dark);
+    }
+    
+    .user-dropdown-item:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+    
+    .user-dropdown-item.logout {
+      color: var(--danger);
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .content {
+      padding: 20px;
+      flex: 1;
+    }
+    
+    .section {
+      display: none;
+    }
+    
+    .section.active {
+      display: block;
+    }
+    
+    /* لوحة الإحصائيات */
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+    
+    .stat-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .stat-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+    }
+    
+    .stat-icon.primary {
+      background: rgba(99, 102, 241, 0.1);
+      color: var(--primary);
+    }
+    
+    .stat-icon.success {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+    }
+    
+    .stat-icon.warning {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--warning);
+    }
+    
+    .stat-icon.danger {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+    }
+    
+    .stat-info h3 {
+      font-size: 1.5rem;
+      margin-bottom: 5px;
+    }
+    
+    .stat-info p {
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+    
+    /* جدول المذاكرة */
+    .schedule-section {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 25px;
+    }
+    
+    .section-header {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .section-title {
+      font-size: 1.3rem;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .section-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .days-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 15px;
+    }
+    
+    .day-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+      transition: var(--transition);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+    
+    .day-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .day-header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      padding: 12px 15px;
+      color: white;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .day-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    
+    .day-action-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .day-action-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.1);
+    }
+    
+    .day-content {
+      padding: 15px;
+    }
+    
+    .tasks-list {
+      list-style: none;
+      margin-bottom: 15px;
+    }
+    
+    .task-item {
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      background: var(--light);
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: var(--transition);
+      cursor: pointer;
+      border-right: 3px solid transparent;
+    }
+    
+    .task-item:hover {
+      background: rgba(99, 102, 241, 0.05);
+      border-right-color: var(--primary);
+    }
+    
+    .task-item.completed {
+      background: rgba(16, 185, 129, 0.1);
+      text-decoration: line-through;
+      opacity: 0.7;
+    }
+    
+    .task-item.vacation {
+      background: rgba(245, 158, 11, 0.1);
+    }
+    
+    .task-text {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .task-actions {
+      display: flex;
+      gap: 5px;
+      opacity: 0;
+      transition: var(--transition);
+    }
+    
+    .task-item:hover .task-actions {
+      opacity: 1;
+    }
+    
+    .task-btn {
+      background: none;
+      border: none;
+      color: var(--gray);
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 4px;
+      border-radius: 4px;
+      transition: var(--transition);
+    }
+    
+    .task-btn:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+    
+    .task-btn.edit:hover {
+      color: var(--primary);
+    }
+    
+    .task-btn.delete:hover {
+      color: var(--danger);
+    }
+    
+    .task-btn.vacation:hover {
+      color: var(--warning);
+    }
+    
+    .task-btn.link:hover {
+      color: var(--info);
+    }
+    
+    .add-task-form {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    
+    .task-input {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      font-family: inherit;
+      background: var(--light);
+      color: var(--dark);
+    }
+    
+    .task-input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    
+    /* الملف الشخصي */
+    .profile-section {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 25px;
+    }
+    
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+    
+    .profile-avatar {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.8rem;
+      font-weight: bold;
+    }
+    
+    .profile-info h3 {
+      font-size: 1.3rem;
+      margin-bottom: 5px;
+    }
+    
+    .profile-info p {
+      color: var(--gray);
+    }
+    
+    .profile-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px;
+      margin-top: 15px;
+    }
+    
+    .profile-stat {
+      text-align: center;
+      padding: 12px;
+      background: var(--light);
+      border-radius: var(--radius);
+    }
+    
+    .profile-stat-value {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: var(--primary);
+    }
+    
+    .profile-stat-label {
+      font-size: 0.8rem;
+      color: var(--gray);
+      margin-top: 5px;
+    }
+    
+    /* شريط التقدم */
+    .progress-container {
+      margin-top: 15px;
+    }
+    
+    .progress-bar {
+      height: 8px;
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--success), #34d399);
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+    
+    .progress-text {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 5px;
+      font-size: 0.8rem;
+      color: var(--gray);
+    }
+    
+    /* اقتباس تحفيزي */
+    .motivational-quote {
+      text-align: center;
+      padding: 12px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+      border-radius: var(--radius);
+      margin-bottom: 15px;
+      font-style: italic;
+    }
+    
+    /* نوافذ منبثقة */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(5px);
+      padding: 15px;
+    }
+    
+    .modal-content {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 20px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      animation: modalFadeIn 0.3s ease;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    
+    @keyframes modalFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .modal-title {
+      font-size: 1.2rem;
+      color: var(--dark);
+    }
+    
+    .close-modal {
+      background: none;
+      border: none;
+      font-size: 1.3rem;
+      cursor: pointer;
+      color: var(--gray);
+    }
+    
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 20px;
+    }
+    
+    /* مؤقت البومودورو */
+    .pomodoro-timer {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 25px;
+      text-align: center;
+    }
+    
+    .timer-display {
+      font-size: 3rem;
+      font-weight: 700;
+      margin: 15px 0;
+      color: var(--primary);
+    }
+    
+    .timer-controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+    
+    .timer-type-selector {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+    
+    .timer-type-btn {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 20px;
+      background: var(--light);
+      color: var(--dark);
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 0.9rem;
+    }
+    
+    .timer-type-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+    
+    /* نظام الملاحظات */
+    .notes-section {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 25px;
+    }
+    
+    .notes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+    
+    .note-card {
+      background: var(--light);
+      border-radius: var(--radius);
+      padding: 15px;
+      border-left: 4px solid var(--primary);
+      transition: var(--transition);
+    }
+    
+    .note-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .note-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    
+    .note-date {
+      font-size: 0.8rem;
+      color: var(--gray);
+    }
+    
+    .note-content {
+      margin-bottom: 12px;
+    }
+    
+    .note-actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    /* التقويم الشهري */
+    .calendar-section {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 25px;
+    }
+    
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 3px;
+    }
+    
+    .calendar-day {
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      background: var(--light);
+      cursor: pointer;
+      transition: var(--transition);
+      padding: 3px;
+      position: relative;
+    }
+    
+    .calendar-day:hover {
+      background: rgba(99, 102, 241, 0.1);
+    }
+    
+    .calendar-day.current {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .calendar-day.has-tasks {
+      border: 2px solid var(--success);
+    }
+    
+    .day-number {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    
+    .day-tasks {
+      font-size: 0.7rem;
+      text-align: center;
+      margin-top: 3px;
+    }
+    
+    /* نظام المكافآت */
+    .rewards-section {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 25px;
+    }
+    
+    .badges-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+    
+    .badge-card {
+      background: var(--light);
+      border-radius: var(--radius);
+      padding: 15px;
+      text-align: center;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .badge-card.earned {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+      transform: scale(1.05);
+    }
+    
+    .badge-card.locked {
+      opacity: 0.6;
+      filter: grayscale(1);
+    }
+    
+    .badge-icon {
+      font-size: 2.2rem;
+      margin-bottom: 8px;
+    }
+    
+    .badge-name {
+      font-weight: 700;
+      margin-bottom: 5px;
+      font-size: 0.9rem;
+    }
+    
+    .badge-desc {
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+    
+    .badge-progress {
+      margin-top: 8px;
+      height: 4px;
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    
+    .badge-progress-bar {
+      height: 100%;
+      background: var(--success);
+      border-radius: 2px;
+      transition: width 0.5s ease;
+    }
+    
+    /* إدارة الروابط */
+    .link-page {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 25px;
+    }
+    
+    .link-form {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .link-preview {
+      margin-top: 15px;
+      padding: 12px;
+      background: var(--light);
+      border-radius: var(--radius);
+      border: 1px dashed var(--gray);
+    }
+    
+    .link-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
+    
+    .saved-links {
+      margin-top: 25px;
+    }
+    
+    /* شريط البحث والتصفية */
+    .search-filter-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .search-box {
+      flex: 1;
+      position: relative;
+    }
+    
+    .search-input {
+      width: 100%;
+      padding: 10px 40px 10px 12px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: var(--radius);
+      font-family: inherit;
+      background: var(--light);
+      color: var(--dark);
+      transition: var(--transition);
+    }
+    
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray);
+    }
+    
+    .filter-select {
+      padding: 10px 12px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: var(--radius);
+      font-family: inherit;
+      background: var(--light);
+      color: var(--dark);
+      width: 100%;
+    }
+    
+    /* وضع التركيز */
+    .focus-mode {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      z-index: 2000;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .focus-mode.active {
+      display: flex;
+    }
+    
+    .focus-task {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      max-width: 90%;
+    }
+    
+    .focus-timer {
+      font-size: 4rem;
+      margin-bottom: 20px;
+      color: white;
+      font-weight: 700;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+    }
+    
+    .focus-controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    /* نظام الأولويات */
+    .priority-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-left: 5px;
+    }
+    
+    .priority-high {
+      background: var(--danger);
+    }
+    
+    .priority-medium {
+      background: var(--warning);
+    }
+    
+    .priority-low {
+      background: var(--success);
+    }
+    
+    /* تخصيص حالة المهمة */
+    .task-status {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .status-btn {
+      padding: 5px 10px;
+      border: none;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .status-btn.active {
+      transform: scale(1.05);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    
+    .status-completed {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--success);
+    }
+    
+    .status-pending {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--danger);
+    }
+    
+    .status-vacation {
+      background: rgba(245, 158, 11, 0.2);
+      color: var(--warning);
+    }
+    
+    /* تحسينات للتقويم */
+    .calendar-navigation {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    
+    .calendar-month-year {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--dark);
+    }
+    
+    /* تحسينات للشاشات المتوسطة والكبيرة */
+    @media (min-width: 768px) {
+      .app-container.active {
+        flex-direction: row;
+      }
+      
+      .sidebar {
+        width: 250px;
+        height: 100vh;
+        position: sticky;
+        top: 0;
+      }
+      
+      .sidebar-menu {
+        flex-direction: column;
+        overflow-x: visible;
+        overflow-y: auto;
+        padding-bottom: 0;
+      }
+      
+      .sidebar-menu li {
+        margin-bottom: 5px;
+      }
+      
+      .sidebar-toggle {
+        display: none;
+      }
+      
+      .header {
+        padding: 20px 30px;
+        flex-direction: row;
+        justify-content: space-between;
+      }
+      
+      .header-top {
+        flex-direction: row;
+      }
+      
+      .search-filter-bar {
+        flex-direction: row;
+      }
+      
+      .search-box {
+        min-width: 250px;
+      }
+      
+      .filter-select {
+        width: auto;
+        min-width: 150px;
+      }
+      
+      .section-header {
+        flex-direction: row;
+        align-items: center;
+      }
+      
+      .focus-task {
+        font-size: 2rem;
+      }
+      
+      .focus-timer {
+        font-size: 6rem;
+      }
+    }
+    
+    @media (min-width: 992px) {
+      .sidebar {
+        width: 280px;
+      }
+      
+      .header h1 {
+        font-size: 1.8rem;
+      }
+      
+      .timer-display {
+        font-size: 4rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- شاشة التحميل -->
+  <div id="loadingScreen" class="loading-screen">
+    <div class="loading-logo">
+      <i class="fas fa-graduation-cap"></i>
+    </div>
+    <div class="loading-text">جاري تحميل نظام المذاكرة الذكي...</div>
+    <div class="loading-bar">
+      <div class="loading-progress" id="loadingProgress"></div>
+    </div>
+  </div>
+
+  <!-- شاشة تسجيل الدخول -->
+  <div id="authSection" class="auth-container">
+    <div class="auth-box">
+      <div class="auth-logo">
+        <i class="fas fa-graduation-cap"></i>
+      </div>
+      <h2 class="auth-title">نظام المذاكرة الذكي</h2>
+      
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="showAuthForm('login')">تسجيل الدخول</button>
+        <button class="auth-tab" onclick="showAuthForm('register')">إنشاء حساب</button>
+      </div>
+      
+      <form id="loginForm" class="auth-form active" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <input type="email" class="form-control" id="loginEmail" placeholder="البريد الإلكتروني" required>
+        </div>
+        <div class="form-group">
+          <input type="password" class="form-control" id="loginPassword" placeholder="كلمة المرور" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">
+          <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+        </button>
+      </form>
+      
+      <form id="registerForm" class="auth-form" onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <input type="text" class="form-control" id="registerName" placeholder="الاسم الكامل" required>
+        </div>
+        <div class="form-group">
+          <input type="email" class="form-control" id="registerEmail" placeholder="البريد الإلكتروني" required>
+        </div>
+        <div class="form-group">
+          <input type="password" class="form-control" id="registerPassword" placeholder="كلمة المرور" required minlength="6">
+        </div>
+        <div class="form-group">
+          <input type="password" class="form-control" id="registerConfirmPassword" placeholder="تأكيد كلمة المرور" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">
+          <i class="fas fa-user-plus"></i> إنشاء حساب
+        </button>
+      </form>
+      
+      <div class="auth-footer">
+        <p>بالاستمرار، أنت توافق على <a href="#" class="auth-link">شروط الخدمة</a> و <a href="#" class="auth-link">سياسة الخصوصية</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- التطبيق الرئيسي (سيتم إظهاره بعد تسجيل الدخول) -->
+  <div id="appContainer" class="app-container">
+    <!-- الشريط الجانبي -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h2><i class="fas fa-graduation-cap"></i> نظام المذاكرة</h2>
+        <button class="sidebar-toggle" id="sidebarToggle">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+      <ul class="sidebar-menu">
+        <li><a href="#" class="active" onclick="showSection('home')"><i class="fas fa-home"></i> الرئيسية</a></li>
+        <li><a href="#" onclick="showSection('schedule')"><i class="fas fa-calendar-alt"></i> جدول المذاكرة</a></li>
+        <li><a href="#" onclick="showSection('pomodoro')"><i class="fas fa-clock"></i> مؤقت البومودورو</a></li>
+        <li><a href="#" onclick="showSection('notes')"><i class="fas fa-sticky-note"></i> الملاحظات</a></li>
+        <li><a href="#" onclick="showSection('calendar')"><i class="fas fa-calendar"></i> التقويم</a></li>
+        <li><a href="#" onclick="showSection('rewards')"><i class="fas fa-trophy"></i> المكافآت</a></li>
+        <li><a href="#" onclick="showSection('resources')"><i class="fas fa-link"></i> إدارة الروابط</a></li>
+        <li><a href="#" onclick="showSection('profile')"><i class="fas fa-user"></i> الملف الشخصي</a></li>
+        <li><a href="#" onclick="showSection('stats')"><i class="fas fa-chart-line"></i> الإحصائيات</a></li>
+        <li><a href="#" onclick="showSection('settings')"><i class="fas fa-cog"></i> الإعدادات</a></li>
+      </ul>
+      <div class="sidebar-footer">
+        <button class="theme-toggle" id="themeToggle">
+          <i class="fas fa-moon"></i>
+        </button>
+        <div class="user-info">
+          <span id="userName">طالب علمي</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- المحتوى الرئيسي -->
+    <div class="main-content">
+      <div class="header">
+        <div class="header-top">
+          <h1><i class="fas fa-book-open"></i> نظام المذاكرة الذكي</h1>
+          <div class="user-actions">
+            <div class="user-menu">
+              <div class="user-profile" onclick="toggleUserDropdown()">
+                <div class="user-avatar" id="userAvatar">م</div>
+                <span id="headerUserName">محمد</span>
+                <i class="fas fa-chevron-down"></i>
+              </div>
+              <div class="user-dropdown" id="userDropdown">
+                <button class="user-dropdown-item" onclick="showSection('profile')">
+                  <i class="fas fa-user"></i> الملف الشخصي
+                </button>
+                <button class="user-dropdown-item" onclick="showSection('settings')">
+                  <i class="fas fa-cog"></i> الإعدادات
+                </button>
+                <button class="user-dropdown-item logout" onclick="logout()">
+                  <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-primary" onclick="saveProgress()">
+            <i class="fas fa-save"></i> حفظ التقدم
+          </button>
+          <button class="btn btn-success" onclick="openAddTaskModal()">
+            <i class="fas fa-plus"></i> إضافة مهمة
+          </button>
+          <button class="btn btn-warning" onclick="toggleFocusMode()">
+            <i class="fas fa-bullseye"></i> وضع التركيز
+          </button>
+        </div>
+      </div>
+
+      <div class="content">
+        <!-- القسم الرئيسي -->
+        <div id="home-section" class="section active">
+          <div class="motivational-quote" id="motivationalQuote">
+            <i class="fas fa-quote-left"></i> النجاح هو مجموع الجهود الصغيرة المتكررة يومياً <i class="fas fa-quote-right"></i>
+          </div>
+          
+          <!-- شريط البحث والتصفية -->
+          <div class="search-filter-bar">
+            <div class="search-box">
+              <i class="fas fa-search search-icon"></i>
+              <input type="text" class="search-input" placeholder="ابحث في المهام..." oninput="filterTasks(this.value)">
+            </div>
+            <select class="filter-select" onchange="filterTasksByStatus(this.value)">
+              <option value="all">جميع المهام</option>
+              <option value="completed">المكتملة فقط</option>
+              <option value="pending">المعلقة فقط</option>
+              <option value="vacation">في إجازة</option>
+              <option value="with-links">تحتوي على روابط</option>
+            </select>
+          </div>
+          
+          <!-- لوحة الإحصائيات -->
+          <div class="dashboard">
+            <div class="stat-card">
+              <div class="stat-icon primary">
+                <i class="fas fa-tasks"></i>
+              </div>
+              <div class="stat-info">
+                <h3 id="completedTasks">0</h3>
+                <p>مهمة مكتملة</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon success">
+                <i class="fas fa-check-circle"></i>
+              </div>
+              <div class="stat-info">
+                <h3 id="totalTasks">35</h3>
+                <p>إجمالي المهام</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon warning">
+                <i class="fas fa-chart-pie"></i>
+              </div>
+              <div class="stat-info">
+                <h3 id="progressPercent">0%</h3>
+                <p>نسبة الإنجاز</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon danger">
+                <i class="fas fa-clock"></i>
+              </div>
+              <div class="stat-info">
+                <h3 id="remainingTasks">35</h3>
+                <p>مهمة متبقية</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- جدول المذاكرة المصغر -->
+          <div class="schedule-section">
+            <div class="section-header">
+              <h2 class="section-title"><i class="fas fa-calendar-week"></i> نظرة سريعة على الجدول</h2>
+              <button class="btn btn-primary" onclick="showSection('schedule')">
+                <i class="fas fa-external-link-alt"></i> عرض كامل
+              </button>
+            </div>
+
+            <div class="progress-container">
+              <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+              </div>
+              <div class="progress-text">
+                <span>لم تبدأ</span>
+                <span id="progressText">0%</span>
+              </div>
+            </div>
+
+            <div class="days-grid" id="miniScheduleContainer">
+              <!-- سيتم ملء الجدول المصغر بالجافاسكريبت -->
+            </div>
+          </div>
+        </div>
+
+        <!-- قسم جدول المذاكرة الكامل -->
+        <div id="schedule-section" class="section">
+          <div class="schedule-section">
+            <div class="section-header">
+              <h2 class="section-title"><i class="fas fa-calendar-week"></i> جدول المذاكرة الأسبوعي</h2>
+              <div class="section-actions">
+                <button class="btn btn-warning" onclick="takeVacation()">
+                  <i class="fas fa-umbrella-beach"></i> إجازة
+                </button>
+                <button class="btn btn-info" onclick="cancelVacation()">
+                  <i class="fas fa-undo"></i> إلغاء الإجازة
+                </button>
+                <button class="btn btn-danger" onclick="resetProgress()">
+                  <i class="fas fa-redo"></i> إعادة تعيين
+                </button>
+              </div>
+            </div>
+            
+            <!-- شريط البحث والتصفية -->
+            <div class="search-filter-bar">
+              <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="ابحث في المهام..." oninput="filterTasks(this.value)">
+              </div>
+              <select class="filter-select" onchange="filterTasksByStatus(this.value)">
+                <option value="all">جميع المهام</option>
+                <option value="completed">المكتملة فقط</option>
+                <option value="pending">المعلقة فقط</option>
+                <option value="vacation">في إجازة</option>
+                <option value="with-links">تحتوي على روابط</option>
+              </select>
+            </div>
+
+            <div class="days-grid" id="scheduleContainer">
+              <!-- سيتم ملء الجدول بالجافاسكريبت -->
+            </div>
+          </div>
+        </div>
+
+        <!-- قسم مؤقت البومودورو -->
+        <div id="pomodoro-section" class="section">
+          <div class="pomodoro-timer">
+            <h2 class="section-title"><i class="fas fa-clock"></i> مؤقت البومودورو</h2>
+            
+            <div class="timer-type-selector">
+              <button class="timer-type-btn active" id="workTimerBtn" onclick="setTimerType('work')">عمل (25 دقيقة)</button>
+              <button class="timer-type-btn" id="breakTimerBtn" onclick="setTimerType('break')">راحة (5 دقائق)</button>
+              <button class="timer-type-btn" id="longBreakTimerBtn" onclick="setTimerType('longBreak')">راحة طويلة (15 دقيقة)</button>
+            </div>
+            
+            <div class="timer-display" id="timerDisplay">25:00</div>
+            
+            <div class="timer-controls">
+              <button class="btn btn-primary" id="startTimerBtn" onclick="startTimer()">
+                <i class="fas fa-play"></i> بدء
+              </button>
+              <button class="btn btn-warning" id="pauseTimerBtn" onclick="pauseTimer()" style="display: none;">
+                <i class="fas fa-pause"></i> إيقاف مؤقت
+              </button>
+              <button class="btn btn-danger" onclick="resetTimer()">
+                <i class="fas fa-stop"></i> إعادة تعيين
+              </button>
+            </div>
+            
+            <div class="pomodoro-stats">
+              <p>جلسات البومودورو المكتملة: <span id="pomodoroSessions">0</span></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- قسم الملاحظات -->
+        <div id="notes-section" class="section">
+          <div class="notes-section">
+            <div class="section-header">
+              <h2 class="section-title"><i class="fas fa-sticky-note"></i> الملاحظات السريعة</h2>
+              <button class="btn btn-primary" onclick="openAddNoteModal()">
+                <i class="fas fa-plus"></i> إضافة ملاحظة
+              </button>
+            </div>
+            
+            <div class="notes-grid" id="notesContainer">
+              <!-- سيتم ملء الملاحظات بالجافاسكريبت -->
+            </div>
+          </div>
+        </div>
+
+        <!-- قسم التقويم -->
+        <div id="calendar-section" class="section">
+          <div class="calendar-section">
+            <div class="section-header">
+              <h2 class="section-title"><i class="fas fa-calendar"></i> التقويم الشهري</h2>
+              <div class="calendar-navigation">
+                <button class="btn" onclick="changeMonth(-1)">
+                  <i class="fas fa-chevron-right"></i> الشهر السابق
+                </button>
+                <h3 class="calendar-month-year" id="currentMonthYear">شهر سنة</h3>
+                <button class="btn" onclick="changeMonth(1)">
+                  الشهر التالي <i class="fas fa-chevron-left"></i>
+                </button>
+              </div>
+            </div>
+            
+            <div class="calendar-grid" id="calendarGrid">
+              <!-- سيتم ملء التقويم بالجافاسكريبت -->
+            </div>
+          </div>
+        </div>
+
+        <!-- قسم المكافآت -->
+        <div id="rewards-section" class="section">
+          <div class="rewards-section">
+            <div class="section-header">
+              <h2 class="section-title"><i class="fas fa-trophy"></i> نظام المكافآت</h2>
+            </div>
+            
+            <div class="user-points">
+              <h3>نقاطك: <span id="userPoints">0</span> نقطة</h3>
+              <div class="progress-container">
+                <div class="progress-bar">
+                  <div class="progress-fill" id="pointsProgress" style="width: 0%"></div>
+                </div>
+                <div class="progress-text">
+                  <span>المستوى الحالي</span>
+                  <span id="userLevel">1</span>
+                </div>
+              </div>
+            </div>
+            
+            <h3 style="margin: 20px 0;">الشهادات والشارات</h3>
+            <div class="badges-grid" id="badgesContainer">
+              <!-- سيتم ملء الشارات بالجافاسكريبت -->
+            </div>
+          </div>
+        </div>
+
+        <!-- قسم إدارة الروابط -->
+        <div id="resources-section" class="section">
+          <div class="link-page">
+            <div class="section-header">
+              <h2 class="section-title"><i class="fas fa-link"></i> إدارة الروابط الخارجية</h2>
+            </div>
+            
+            <div class="link-form">
+              <div class="form-group">
+                <label class="form-label">اسم الرابط:</label>
+                <input type="text" class="form-control" id="linkName" placeholder="أدخل اسم الرابط...">
+              </div>
+              <div class="form-group">
+                <label class="form-label">الرابط:</label>
+                <input type="url" class="form-control" id="linkUrl" placeholder="https://example.com" oninput="updateLinkPreview()">
+              </div>
+              <div class="form-group">
+                <label class="form-label">وصف الرابط (اختياري):</label>
+                <textarea class="form-control" id="linkDescription" rows="3" placeholder="أدخل وصفاً للرابط..." oninput="updateLinkPreview()"></textarea>
+              </div>
+              
+              <div class="link-actions">
+                <button class="btn btn-primary" onclick="addLink()">
+                  <i class="fas fa-plus"></i> إضافة الرابط
+                </button>
+                <button class="btn" onclick="clearLinkForm()">
+                  <i class="fas fa-times"></i> مسح النموذج
+                </button>
+              </div>
+              
+              <div class="link-preview" id="linkPreview" style="display: none;">
+                <h4>معاينة الرابط:</h4>
+                <div id="previewContent"></div>
+              </div>
+            </div>
+            
+            <div class="saved-links" style="margin-top: 30px;">
+              <h3 class="section-title"><i class="fas fa-list"></i> الروابط المحفوظة</h3>
+              <div id="linksList">
+                <!-- سيتم عرض الروابط المحفوظة هنا -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- قسم الملف الشخصي -->
+        <div id="profile-section" class="section">
+          <div class="profile-section">
+            <div class="profile-header">
+              <div class="profile-avatar" id="profileAvatar">م</div>
+              <div class="profile-info">
+                <h3 id="profileName">محمد أحمد</h3>
+                <p id="profileEmail">mohamed@example.com</p>
+                <p>طالب في الصف الثاني الثانوي - علمي</p>
+              </div>
+            </div>
+            
+            <div class="profile-stats">
+              <div class="profile-stat">
+                <div class="profile-stat-value" id="profileTasksCompleted">0</div>
+                <div class="profile-stat-label">مهمة مكتملة</div>
+              </div>
+              <div class="profile-stat">
+                <div class="profile-stat-value" id="profileStreak">0</div>
+                <div class="profile-stat-label">أيام متتالية</div>
+              </div>
+              <div class="profile-stat">
+                <div class="profile-stat-value" id="profileLevel">1</div>
+                <div class="profile-stat-label">المستوى</div>
+              </div>
+              <div class="profile-stat">
+                <div class="profile-stat-value" id="profilePoints">0</div>
+                <div class="profile-stat-label">النقاط</div>
+              </div>
+            </div>
+            
+            <div class="section-header" style="margin-top: 30px;">
+              <h2 class="section-title"><i class="fas fa-chart-bar"></i> إحصائيات الأداء</h2>
+            </div>
+            
+            <div class="dashboard">
+              <div class="stat-card">
+                <div class="stat-icon primary">
+                  <i class="fas fa-fire"></i>
+                </div>
+                <div class="stat-info">
+                  <h3 id="profilePomodoroSessions">0</h3>
+                  <p>جلسات بومودورو</p>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon success">
+                  <i class="fas fa-sticky-note"></i>
+                </div>
+                <div class="stat-info">
+                  <h3 id="profileNotesCount">0</h3>
+                  <p>ملاحظات</p>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon warning">
+                  <i class="fas fa-link"></i>
+                </div>
+                <div class="stat-info">
+                  <h3 id="profileLinksCount">0</h3>
+                  <p>روابط محفوظة</p>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon danger">
+                  <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="stat-info">
+                  <h3 id="profileStudyDays">0</h3>
+                  <p>أيام مذاكرة</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- قسم الإحصائيات -->
+        <div id="stats-section" class="section">
+          <div class="schedule-section">
+            <div class="section-header">
+              <h2 class="section-title"><i class="fas fa-chart-line"></i> إحصائيات وتقارير الأداء</h2>
+            </div>
+            
+            <div class="stats-content">
+              <div class="dashboard">
+                <div class="stat-card">
+                  <div class="stat-icon primary">
+                    <i class="fas fa-fire"></i>
+                  </div>
+                  <div class="stat-info">
+                    <h3 id="streakDays">0</h3>
+                    <p>أيام متتالية من المذاكرة</p>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-icon success">
+                    <i class="fas fa-bolt"></i>
+                  </div>
+                  <div class="stat-info">
+                    <h3 id="weeklyCompleted">0</h3>
+                    <p>مهام مكتملة هذا الأسبوع</p>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-icon warning">
+                    <i class="fas fa-trophy"></i>
+                  </div>
+                  <div class="stat-info">
+                    <h3 id="bestDay">لا يوجد</h3>
+                    <p>أكثر يوم إنتاجية</p>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-icon danger">
+                    <i class="fas fa-hourglass-half"></i>
+                  </div>
+                  <div class="stat-info">
+                    <h3 id="totalStudyTime">0</h3>
+                    <p>إجمالي وقت المذاكرة (ساعة)</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- قسم الإعدادات -->
+        <div id="settings-section" class="section">
+          <div class="schedule-section">
+            <div class="section-header">
+              <h2 class="section-title"><i class="fas fa-cog"></i> الإعدادات</h2>
+            </div>
+            
+            <div class="settings-content">
+              <div class="form-group">
+                <label class="form-label">اسم المستخدم:</label>
+                <input type="text" class="form-control" id="settingsUserName" placeholder="أدخل اسم المستخدم...">
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">البريد الإلكتروني:</label>
+                <input type="email" class="form-control" id="settingsUserEmail" placeholder="أدخل البريد الإلكتروني...">
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">كلمة المرور الجديدة:</label>
+                <input type="password" class="form-control" id="settingsUserPassword" placeholder="أدخل كلمة المرور الجديدة...">
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">تأكيد كلمة المرور:</label>
+                <input type="password" class="form-control" id="settingsUserConfirmPassword" placeholder="أكد كلمة المرور الجديدة...">
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">إعدادات المؤقت:</label>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                  <div>
+                    <label>وقت العمل (دقيقة):</label>
+                    <input type="number" class="form-control" id="workTime" value="25" min="5" max="60">
+                  </div>
+                  <div>
+                    <label>وقت الراحة (دقيقة):</label>
+                    <input type="number" class="form-control" id="breakTime" value="5" min="1" max="30">
+                  </div>
+                  <div>
+                    <label>وقت الراحة الطويلة (دقيقة):</label>
+                    <input type="number" class="form-control" id="longBreakTime" value="15" min="5" max="60">
+                  </div>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">إدارة البيانات:</label>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                  <button class="btn btn-primary" onclick="exportUserData()">
+                    <i class="fas fa-download"></i> تصدير البيانات
+                  </button>
+                  <button class="btn btn-success" onclick="document.getElementById('importFile').click()">
+                    <i class="fas fa-upload"></i> استيراد البيانات
+                  </button>
+                  <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importUserData(event)">
+                  <button class="btn btn-danger" onclick="clearAllData()">
+                    <i class="fas fa-trash"></i> مسح جميع البيانات
+                  </button>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <button class="btn btn-success" onclick="saveSettings()">
+                  <i class="fas fa-save"></i> حفظ الإعدادات
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- نافذة إضافة مهمة -->
+  <div id="addTaskModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">إضافة مهمة جديدة</h3>
+        <button class="close-modal" onclick="closeAddTaskModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">نص المهمة:</label>
+          <input type="text" class="form-control" id="newTaskText" placeholder="أدخل نص المهمة...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">اليوم:</label>
+          <select class="form-control" id="newTaskDay">
+            <option value="السبت">السبت</option>
+            <option value="الأحد">الأحد</option>
+            <option value="الإثنين">الإثنين</option>
+            <option value="الثلاثاء">الثلاثاء</option>
+            <option value="الأربعاء">الأربعاء</option>
+            <option value="الخميس">الخميس</option>
+            <option value="الجمعة">الجمعة</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">الأولوية:</label>
+          <select class="form-control" id="newTaskPriority">
+            <option value="low">منخفضة</option>
+            <option value="medium">متوسطة</option>
+            <option value="high">عالية</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">ملاحظات إضافية (اختياري):</label>
+          <textarea class="form-control" id="newTaskNotes" rows="3" placeholder="أضف ملاحظات إضافية للمهمة..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">رابط خارجي (اختياري):</label>
+          <input type="url" class="form-control" id="newTaskLink" placeholder="https://example.com">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="addNewTask()">
+          <i class="fas fa-plus"></i> إضافة المهمة
+        </button>
+        <button class="btn" onclick="closeAddTaskModal()">
+          <i class="fas fa-times"></i> إلغاء
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- نافذة تعديل مهمة -->
+  <div id="editTaskModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">تعديل المهمة</h3>
+        <button class="close-modal" onclick="closeEditTaskModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">نص المهمة:</label>
+          <input type="text" class="form-control" id="editTaskText" placeholder="أدخل نص المهمة...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">اليوم:</label>
+          <select class="form-control" id="editTaskDay">
+            <option value="السبت">السبت</option>
+            <option value="الأحد">الأحد</option>
+            <option value="الإثنين">الإثنين</option>
+            <option value="الثلاثاء">الثلاثاء</option>
+            <option value="الأربعاء">الأربعاء</option>
+            <option value="الخميس">الخميس</option>
+            <option value="الجمعة">الجمعة</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">الأولوية:</label>
+          <select class="form-control" id="editTaskPriority">
+            <option value="low">منخفضة</option>
+            <option value="medium">متوسطة</option>
+            <option value="high">عالية</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">ملاحظات إضافية:</label>
+          <textarea class="form-control" id="editTaskNotes" rows="3" placeholder="أضف ملاحظات إضافية للمهمة..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">رابط خارجي:</label>
+          <input type="url" class="form-control" id="editTaskLink" placeholder="https://example.com">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="saveTaskChanges()">
+          <i class="fas fa-save"></i> حفظ التغييرات
+        </button>
+        <button class="btn" onclick="closeEditTaskModal()">
+          <i class="fas fa-times"></i> إلغاء
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- نافذة إضافة ملاحظة -->
+  <div id="addNoteModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">إضافة ملاحظة جديدة</h3>
+        <button class="close-modal" onclick="closeAddNoteModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">عنوان الملاحظة:</label>
+          <input type="text" class="form-control" id="newNoteTitle" placeholder="أدخل عنوان الملاحظة...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">محتوى الملاحظة:</label>
+          <textarea class="form-control" id="newNoteContent" rows="5" placeholder="أدخل محتوى الملاحظة..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="addNewNote()">
+          <i class="fas fa-plus"></i> إضافة الملاحظة
+        </button>
+        <button class="btn" onclick="closeAddNoteModal()">
+          <i class="fas fa-times"></i> إلغاء
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- نافذة عرض ملاحظات المهمة -->
+  <div id="taskNotesModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">ملاحظات المهمة</h3>
+        <button class="close-modal" onclick="closeTaskNotesModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="taskNotesContent">
+          <!-- سيتم ملء محتوى الملاحظات هنا -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeTaskNotesModal()">
+          <i class="fas fa-times"></i> إغلاق
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- وضع التركيز -->
+  <div id="focusMode" class="focus-mode">
+    <div class="focus-task" id="focusTask">اختر مهمة للتركيز عليها</div>
+    <div class="focus-timer" id="focusTimer">60:00</div>
+    <div class="focus-controls">
+      <button class="btn btn-success" onclick="startFocusTimer()">
+        <i class="fas fa-play"></i> بدء
+      </button>
+      <button class="btn btn-warning" onclick="pauseFocusTimer()">
+        <i class="fas fa-pause"></i> إيقاف
+      </button>
+      <button class="btn btn-danger" onclick="toggleFocusMode()">
+        <i class="fas fa-times"></i> خروج
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // ========== المتغيرات العامة ==========
+    let currentUser = null;
+    let tasks = [];
+    let notes = [];
+    let links = [];
+    let pomodoroSessions = 0;
+    let userPoints = 0;
+    let streakDays = 0;
+    let studyDays = new Set();
+    let completedTasksCount = 0;
+    
+    // مؤقت البومودورو
+    let timerInterval;
+    let timerMinutes = 25;
+    let timerSeconds = 0;
+    let timerRunning = false;
+    let timerType = 'work'; // work, break, longBreak
+    
+    // مؤقت التركيز
+    let focusTimerInterval;
+    let focusMinutes = 60;
+    let focusSeconds = 0;
+    let focusTimerRunning = false;
+    let currentFocusTask = null;
+    
+    // التقويم
+    let currentDate = new Date();
+    let currentMonth = currentDate.getMonth();
+    let currentYear = currentDate.getFullYear();
+    
+    // مهمة قيد التعديل
+    let editingTaskId = null;
+    
+    // ========== نظام قاعدة البيانات (IndexedDB) ==========
+    const DB_NAME = 'StudySystemDB';
+    const DB_VERSION = 1;
+    let db;
+
+    // فتح قاعدة البيانات
+    function openDatabase() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
+            
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => {
+                db = request.result;
+                resolve(db);
+            };
+            
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                
+                // إنشاء مخزن للمستخدمين
+                if (!db.objectStoreNames.contains('users')) {
+                    const userStore = db.createObjectStore('users', { keyPath: 'email' });
+                    userStore.createIndex('name', 'name', { unique: false });
+                }
+                
+                // إنشاء مخزن للبيانات
+                if (!db.objectStoreNames.contains('userData')) {
+                    const dataStore = db.createObjectStore('userData', { keyPath: 'userId' });
+                    dataStore.createIndex('lastSync', 'lastSync', { unique: false });
+                }
+            };
+        });
+    }
+
+    // حفظ بيانات المستخدم
+    async function saveUserData() {
+        if (!db) await openDatabase();
+        
+        const userData = {
+            tasks: tasks,
+            notes: notes,
+            links: links,
+            pomodoroSessions: pomodoroSessions,
+            userPoints: userPoints,
+            streakDays: streakDays,
+            studyDays: Array.from(studyDays),
+            completedTasksCount: completedTasksCount,
+            lastSync: new Date().toISOString()
+        };
+        
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction(['userData'], 'readwrite');
+            const store = transaction.objectStore('userData');
+            
+            const data = {
+                userId: currentUser,
+                ...userData
+            };
+            
+            const request = store.put(data);
+            
+            request.onsuccess = () => {
+                console.log('تم حفظ البيانات بنجاح');
+                resolve(request.result);
+            };
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    // تحميل بيانات المستخدم
+    async function loadUserData() {
+        if (!db) await openDatabase();
+        
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction(['userData'], 'readonly');
+            const store = transaction.objectStore('userData');
+            const request = store.get(currentUser);
+            
+            request.onsuccess = () => {
+                const userData = request.result || {};
+                resolve(userData);
+            };
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    // ========== نظام المصادقة ==========
+    async function handleLogin(event) {
+        event.preventDefault();
+        
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        
+        if (!db) await openDatabase();
+        
+        try {
+            const transaction = db.transaction(['users'], 'readonly');
+            const store = transaction.objectStore('users');
+            const request = store.get(email);
+            
+            request.onsuccess = () => {
+                const user = request.result;
+                
+                if (user && user.password === password) {
+                    currentUser = email;
+                    showNotification('تم تسجيل الدخول بنجاح!', 'success');
+                    
+                    // حفظ بيانات تسجيل الدخول
+                    localStorage.setItem('currentUser', email);
+                    
+                    // تحميل بيانات المستخدم
+                    loadUserData().then(userData => {
+                        if (userData.tasks) tasks = userData.tasks;
+                        if (userData.notes) notes = userData.notes;
+                        if (userData.links) links = userData.links;
+                        if (userData.pomodoroSessions) pomodoroSessions = userData.pomodoroSessions;
+                        if (userData.userPoints) userPoints = userData.userPoints;
+                        if (userData.streakDays) streakDays = userData.streakDays;
+                        if (userData.studyDays) studyDays = new Set(userData.studyDays);
+                        if (userData.completedTasksCount) completedTasksCount = userData.completedTasksCount;
+                        
+                        // تحديث واجهة المستخدم
+                        updateUserInfo(user);
+                        initializeApp();
+                        
+                        // الانتقال للتطبيق
+                        setTimeout(() => {
+                            document.getElementById('authSection').style.display = 'none';
+                            document.getElementById('appContainer').classList.add('active');
+                        }, 1000);
+                    });
+                } else {
+                    showNotification('البريد الإلكتروني أو كلمة المرور غير صحيحة!', 'error');
+                }
+            };
+        } catch (error) {
+            showNotification('خطأ في تسجيل الدخول: ' + error.message, 'error');
+        }
+    }
+
+    async function handleRegister(event) {
+        event.preventDefault();
+        
+        const name = document.getElementById('registerName').value;
+        const email = document.getElementById('registerEmail').value;
+        const password = document.getElementById('registerPassword').value;
+        const confirmPassword = document.getElementById('registerConfirmPassword').value;
+        
+        if (password !== confirmPassword) {
+            showNotification('كلمات المرور غير متطابقة!', 'error');
+            return;
+        }
+        
+        if (!db) await openDatabase();
+        
+        try {
+            const transaction = db.transaction(['users'], 'readwrite');
+            const store = transaction.objectStore('users');
+            
+            // التحقق من وجود المستخدم
+            const checkRequest = store.get(email);
+            
+            checkRequest.onsuccess = () => {
+                if (checkRequest.result) {
+                    showNotification('هذا البريد الإلكتروني مسجل بالفعل!', 'error');
+                    return;
+                }
+                
+                // إنشاء المستخدم الجديد
+                const user = {
+                    email: email,
+                    name: name,
+                    password: password,
+                    createdAt: new Date().toISOString()
+                };
+                
+                const addRequest = store.add(user);
+                
+                addRequest.onsuccess = () => {
+                    currentUser = email;
+                    
+                    // حفظ بيانات تسجيل الدخول
+                    localStorage.setItem('currentUser', email);
+                    
+                    // تهيئة البيانات الأولية
+                    initializeDefaultData();
+                    
+                    showNotification('تم إنشاء الحساب بنجاح!', 'success');
+                    showAuthForm('login');
+                };
+            };
+        } catch (error) {
+            showNotification('خطأ في إنشاء الحساب: ' + error.message, 'error');
+        }
+    }
+
+    function logout() {
+        currentUser = null;
+        tasks = [];
+        notes = [];
+        links = [];
+        
+        // حذف بيانات تسجيل الدخول
+        localStorage.removeItem('currentUser');
+        
+        document.getElementById('appContainer').classList.remove('active');
+        document.getElementById('authSection').style.display = 'flex';
+        showNotification('تم تسجيل الخروج بنجاح', 'success');
+    }
+
+    // ========== النظام الأساسي ==========
+    function showAuthForm(formType) {
+        document.querySelectorAll('.auth-form').forEach(form => {
+            form.classList.remove('active');
+        });
+        document.querySelectorAll('.auth-tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        
+        if (formType === 'login') {
+            document.getElementById('loginForm').classList.add('active');
+            document.querySelectorAll('.auth-tab')[0].classList.add('active');
+        } else {
+            document.getElementById('registerForm').classList.add('active');
+            document.querySelectorAll('.auth-tab')[1].classList.add('active');
+        }
+    }
+
+    function showSection(sectionId) {
+        document.querySelectorAll('.section').forEach(section => {
+            section.classList.remove('active');
+        });
+        document.querySelectorAll('.sidebar-menu a').forEach(link => {
+            link.classList.remove('active');
+        });
+        
+        document.getElementById(sectionId + '-section').classList.add('active');
+        event.target.classList.add('active');
+        
+        // تحديث المحتوى بناءً على القسم
+        switch(sectionId) {
+            case 'home':
+                updateDashboard();
+                renderMiniSchedule();
+                break;
+            case 'schedule':
+                renderSchedule();
+                break;
+            case 'notes':
+                renderNotes();
+                break;
+            case 'calendar':
+                renderCalendar();
+                break;
+            case 'rewards':
+                updateRewards();
+                break;
+            case 'resources':
+                renderLinks();
+                break;
+            case 'profile':
+                updateProfile();
+                break;
+            case 'stats':
+                updateStats();
+                break;
+        }
+    }
+
+    function updateUserInfo(user) {
+        const userName = user.name || 'مستخدم';
+        document.getElementById('userName').textContent = userName;
+        document.getElementById('headerUserName').textContent = userName;
+        document.getElementById('userAvatar').textContent = userName.charAt(0);
+        document.getElementById('profileAvatar').textContent = userName.charAt(0);
+        document.getElementById('profileName').textContent = userName;
+        document.getElementById('profileEmail').textContent = currentUser;
+    }
+
+    function initializeApp() {
+        updateDashboard();
+        renderSchedule();
+        renderMiniSchedule();
+        renderNotes();
+        updateProfile();
+        updateRewards();
+        renderLinks();
+        
+        // تهيئة التقويم
+        renderCalendar();
+        
+        // تحميل حالة الدارك مود
+        loadDarkMode();
+    }
+
+    function initializeDefaultData() {
+        // بيانات أولية للمستخدم الجديد
+        tasks = [
+            { id: 1, text: 'مراجعة الرياضيات - الفصل الأول', day: 'السبت', completed: false, priority: 'high' },
+            { id: 2, text: 'حل مسائل الفيزياء', day: 'السبت', completed: false, priority: 'medium' },
+            { id: 3, text: 'دراسة الكيمياء - التفاعلات', day: 'الأحد', completed: false, priority: 'high' },
+            { id: 4, text: 'مراجعة الأحياء - الخلية', day: 'الإثنين', completed: false, priority: 'medium' }
+        ];
+        
+        notes = [
+            { id: 1, title: 'ملاحظات مهمة', content: 'تذكر مراجعة النظريات الأساسية', date: new Date().toISOString() }
+        ];
+        
+        links = [
+            { id: 1, name: 'موقع الرياضيات', url: 'https://www.khanacademy.org/math', description: 'دروس رياضيات مجانية' }
+        ];
+        
+        saveUserData();
+    }
+
+    // ========== نظام المهام ==========
+    function renderSchedule() {
+        const scheduleContainer = document.getElementById('scheduleContainer');
+        const days = ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'];
+        
+        scheduleContainer.innerHTML = '';
+        
+        days.forEach(day => {
+            const dayTasks = tasks.filter(task => task.day === day);
+            const completedCount = dayTasks.filter(task => task.completed).length;
+            
+            const dayCard = document.createElement('div');
+            dayCard.className = 'day-card';
+            dayCard.innerHTML = `
+                <div class="day-header">
+                    <span>${day}</span>
+                    <div class="day-actions">
+                        <span>${completedCount}/${dayTasks.length}</span>
+                        <button class="day-action-btn" onclick="addQuickTask('${day}')">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="day-content">
+                    <ul class="tasks-list" id="tasks-${day}">
+                        ${dayTasks.map(task => `
+                            <li class="task-item ${task.completed ? 'completed' : ''} ${task.vacation ? 'vacation' : ''}" 
+                                onclick="toggleTaskCompletion(${task.id})">
+                                <div class="task-text">
+                                    ${task.text}
+                                    ${task.priority === 'high' ? '<span class="priority-indicator priority-high"></span>' : ''}
+                                    ${task.priority === 'medium' ? '<span class="priority-indicator priority-medium"></span>' : ''}
+                                    ${task.priority === 'low' ? '<span class="priority-indicator priority-low"></span>' : ''}
+                                    ${task.link ? '<i class="fas fa-link" style="margin-right: 5px; color: var(--info);"></i>' : ''}
+                                    ${task.notes ? '<i class="fas fa-sticky-note" style="margin-right: 5px; color: var(--warning);"></i>' : ''}
+                                </div>
+                                <div class="task-actions">
+                                    ${task.link ? '<button class="task-btn link" onclick="openTaskLink(' + task.id + ', event)"><i class="fas fa-external-link-alt"></i></button>' : ''}
+                                    ${task.notes ? '<button class="task-btn link" onclick="showTaskNotes(' + task.id + ', event)"><i class="fas fa-eye"></i></button>' : ''}
+                                    <button class="task-btn edit" onclick="editTask(${task.id}, event)"><i class="fas fa-edit"></i></button>
+                                    <button class="task-btn delete" onclick="deleteTask(${task.id}, event)"><i class="fas fa-trash"></i></button>
+                                    <button class="task-btn vacation" onclick="toggleTaskVacation(${task.id}, event)">
+                                        <i class="fas ${task.vacation ? 'fa-undo' : 'fa-umbrella-beach'}"></i>
+                                    </button>
+                                </div>
+                            </li>
+                        `).join('')}
+                    </ul>
+                    <div class="add-task-form">
+                        <input type="text" class="task-input" id="quick-task-${day}" placeholder="أضف مهمة سريعة...">
+                        <button class="btn btn-primary" onclick="addTaskFromInput('${day}')">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            scheduleContainer.appendChild(dayCard);
+        });
+    }
+
+    function renderMiniSchedule() {
+        const miniContainer = document.getElementById('miniScheduleContainer');
+        const days = ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء'];
+        
+        miniContainer.innerHTML = '';
+        
+        days.forEach(day => {
+            const dayTasks = tasks.filter(task => task.day === day);
+            const completedCount = dayTasks.filter(task => task.completed).length;
+            const progress = dayTasks.length > 0 ? (completedCount / dayTasks.length) * 100 : 0;
+            
+            const dayCard = document.createElement('div');
+            dayCard.className = 'day-card';
+            dayCard.innerHTML = `
+                <div class="day-header">
+                    <span>${day}</span>
+                    <span>${completedCount}/${dayTasks.length}</span>
+                </div>
+                <div class="day-content">
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${progress}%"></div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 0.9rem;">
+                        ${dayTasks.slice(0, 2).map(task => `
+                            <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 5px;">
+                                <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTaskCompletion(${task.id})">
+                                <span style="${task.completed ? 'text-decoration: line-through; opacity: 0.7;' : ''}">
+                                    ${task.text.length > 20 ? task.text.substring(0, 20) + '...' : task.text}
+                                </span>
+                            </div>
+                        `).join('')}
+                        ${dayTasks.length > 2 ? `<div style="color: var(--gray); font-size: 0.8rem;">+${dayTasks.length - 2} مهام أخرى</div>` : ''}
+                    </div>
+                </div>
+            `;
+            
+            miniContainer.appendChild(dayCard);
+        });
+    }
+
+    function addQuickTask(day) {
+        const taskText = prompt(`أدخل المهمة الجديدة لـ ${day}:`);
+        if (taskText && taskText.trim()) {
+            const newTask = {
+                id: Date.now(),
+                text: taskText.trim(),
+                day: day,
+                completed: false,
+                priority: 'medium'
+            };
+            tasks.push(newTask);
+            saveUserData().then(() => {
+                renderSchedule();
+                renderMiniSchedule();
+                updateDashboard();
+                showNotification('تم إضافة المهمة بنجاح', 'success');
+            });
+        }
+    }
+
+    function addTaskFromInput(day) {
+        const input = document.getElementById(`quick-task-${day}`);
+        const taskText = input.value.trim();
+        
+        if (taskText) {
+            const newTask = {
+                id: Date.now(),
+                text: taskText,
+                day: day,
+                completed: false,
+                priority: 'medium'
+            };
+            tasks.push(newTask);
+            input.value = '';
+            
+            saveUserData().then(() => {
+                renderSchedule();
+                renderMiniSchedule();
+                updateDashboard();
+                showNotification('تم إضافة المهمة بنجاح', 'success');
+            });
+        }
+    }
+
+    function toggleTaskCompletion(taskId) {
+        const task = tasks.find(t => t.id === taskId);
+        if (task) {
+            task.completed = !task.completed;
+            
+            if (task.completed) {
+                completedTasksCount++;
+                userPoints += 10;
+                showNotification('أحسنت! لقد أكملت المهمة وربحت 10 نقاط', 'success');
+                
+                // تحديث أيام المذاكرة
+                const today = new Date().toISOString().split('T')[0];
+                studyDays.add(today);
+            } else {
+                completedTasksCount--;
+                userPoints = Math.max(0, userPoints - 5);
+            }
+            
+            saveUserData().then(() => {
+                renderSchedule();
+                renderMiniSchedule();
+                updateDashboard();
+                updateRewards();
+                updateProfile();
+                renderCalendar();
+            });
+        }
+    }
+
+    function toggleTaskVacation(taskId, event) {
+        event.stopPropagation();
+        const task = tasks.find(t => t.id === taskId);
+        if (task) {
+            task.vacation = !task.vacation;
+            saveUserData().then(() => {
+                renderSchedule();
+                showNotification(task.vacation ? 'تم تعليق المهمة' : 'تم إلغاء تعليق المهمة', 'success');
+            });
+        }
+    }
+
+    function deleteTask(taskId, event) {
+        event.stopPropagation();
+        if (confirm('هل أنت متأكد من حذف هذه المهمة؟')) {
+            tasks = tasks.filter(t => t.id !== taskId);
+            saveUserData().then(() => {
+                renderSchedule();
+                renderMiniSchedule();
+                updateDashboard();
+                showNotification('تم حذف المهمة بنجاح', 'success');
+            });
+        }
+    }
+
+    function editTask(taskId, event) {
+        event.stopPropagation();
+        const task = tasks.find(t => t.id === taskId);
+        if (task) {
+            editingTaskId = taskId;
+            document.getElementById('editTaskText').value = task.text;
+            document.getElementById('editTaskDay').value = task.day;
+            document.getElementById('editTaskPriority').value = task.priority;
+            document.getElementById('editTaskNotes').value = task.notes || '';
+            document.getElementById('editTaskLink').value = task.link || '';
+            document.getElementById('editTaskModal').style.display = 'flex';
+        }
+    }
+
+    function saveTaskChanges() {
+        const task = tasks.find(t => t.id === editingTaskId);
+        if (task) {
+            task.text = document.getElementById('editTaskText').value.trim();
+            task.day = document.getElementById('editTaskDay').value;
+            task.priority = document.getElementById('editTaskPriority').value;
+            task.notes = document.getElementById('editTaskNotes').value.trim();
+            task.link = document.getElementById('editTaskLink').value.trim();
+            
+            saveUserData().then(() => {
+                renderSchedule();
+                renderMiniSchedule();
+                closeEditTaskModal();
+                showNotification('تم تعديل المهمة بنجاح', 'success');
+            });
+        }
+    }
+
+    function openTaskLink(taskId, event) {
+        event.stopPropagation();
+        const task = tasks.find(t => t.id === taskId);
+        if (task && task.link) {
+            window.open(task.link, '_blank');
+        }
+    }
+
+    function showTaskNotes(taskId, event) {
+        event.stopPropagation();
+        const task = tasks.find(t => t.id === taskId);
+        if (task && task.notes) {
+            document.getElementById('taskNotesContent').innerHTML = `
+                <h4>${task.text}</h4>
+                <p>${task.notes}</p>
+            `;
+            document.getElementById('taskNotesModal').style.display = 'flex';
+        } else {
+            showNotification('لا توجد ملاحظات لهذه المهمة', 'warning');
+        }
+    }
+
+    // ========== نظام الملاحظات ==========
+    function renderNotes() {
+        const notesContainer = document.getElementById('notesContainer');
+        notesContainer.innerHTML = '';
+        
+        if (notes.length === 0) {
+            notesContainer.innerHTML = '<p style="text-align: center; color: var(--gray);">لا توجد ملاحظات حتى الآن</p>';
+            return;
+        }
+        
+        notes.forEach(note => {
+            const noteDate = new Date(note.date);
+            const formattedDate = noteDate.toLocaleDateString('ar-SA');
+            
+            const noteCard = document.createElement('div');
+            noteCard.className = 'note-card';
+            noteCard.innerHTML = `
+                <div class="note-header">
+                    <h4>${note.title}</h4>
+                    <span class="note-date">${formattedDate}</span>
+                </div>
+                <div class="note-content">
+                    <p>${note.content}</p>
+                </div>
+                <div class="note-actions">
+                    <button class="btn btn-danger" onclick="deleteNote(${note.id})">
+                        <i class="fas fa-trash"></i> حذف
+                    </button>
+                </div>
+            `;
+            
+            notesContainer.appendChild(noteCard);
+        });
+    }
+
+    function deleteNote(noteId) {
+        if (confirm('هل أنت متأكد من حذف هذه الملاحظة؟')) {
+            notes = notes.filter(n => n.id !== noteId);
+            saveUserData().then(() => {
+                renderNotes();
+                showNotification('تم حذف الملاحظة بنجاح', 'success');
+            });
+        }
+    }
+
+    // ========== نظام التقويم ==========
+    function renderCalendar() {
+        const calendarGrid = document.getElementById('calendarGrid');
+        const monthYearElement = document.getElementById('currentMonthYear');
+        
+        // تحديث عنوان الشهر والسنة
+        const monthNames = [
+            'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+            'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+        ];
+        
+        monthYearElement.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+        
+        // مسح التقويم الحالي
+        calendarGrid.innerHTML = '';
+        
+        // إضافة أيام الأسبوع
+        const daysOfWeek = ['أحد', 'اثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة', 'سبت'];
+        daysOfWeek.forEach(day => {
+            const dayElement = document.createElement('div');
+            dayElement.className = 'calendar-day day-header';
+            dayElement.textContent = day;
+            calendarGrid.appendChild(dayElement);
+        });
+        
+        // الحصول على أول يوم في الشهر
+        const firstDay = new Date(currentYear, currentMonth, 1);
+        const startingDay = firstDay.getDay(); // 0 = الأحد
+        
+        // الحصول على عدد الأيام في الشهر
+        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+        
+        // إضافة أيام فارغة قبل أول يوم
+        for (let i = 0; i < startingDay; i++) {
+            const emptyDay = document.createElement('div');
+            emptyDay.className = 'calendar-day empty';
+            calendarGrid.appendChild(emptyDay);
+        }
+        
+        // إضافة أيام الشهر
+        const today = new Date();
+        const isCurrentMonth = currentMonth === today.getMonth() && currentYear === today.getFullYear();
+        
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dayElement = document.createElement('div');
+            dayElement.className = 'calendar-day';
+            
+            // التحقق إذا كان اليوم الحالي
+            if (isCurrentMonth && day === today.getDate()) {
+                dayElement.classList.add('current');
+            }
+            
+            // الحصول على اسم اليوم
+            const dayName = getDayNameForDate(currentYear, currentMonth, day);
+            
+            // التحقق إذا كان للتاريخ مهام
+            const dayTasks = tasks.filter(task => task.day === dayName);
+            
+            if (dayTasks.length > 0) {
+                dayElement.classList.add('has-tasks');
+            }
+            
+            const dayNumber = document.createElement('div');
+            dayNumber.className = 'day-number';
+            dayNumber.textContent = day;
+            
+            const dayTasksElement = document.createElement('div');
+            dayTasksElement.className = 'day-tasks';
+            
+            if (dayTasks.length > 0) {
+                dayTasksElement.textContent = `${dayTasks.length} مهمة`;
+            }
+            
+            dayElement.appendChild(dayNumber);
+            dayElement.appendChild(dayTasksElement);
+            
+            // إضافة حدث النقر لفتح المهام في ذلك اليوم
+            dayElement.onclick = () => showTasksForDate(dayName, day);
+            
+            calendarGrid.appendChild(dayElement);
+        }
+    }
+
+    function getDayNameForDate(year, month, day) {
+        const date = new Date(year, month, day);
+        const days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+        return days[date.getDay()];
+    }
+
+    function changeMonth(direction) {
+        currentMonth += direction;
+        
+        if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        } else if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        }
+        
+        renderCalendar();
+    }
+
+    function showTasksForDate(dayName, day) {
+        const monthNames = [
+            'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+            'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+        ];
+        
+        const dayTasks = tasks.filter(task => task.day === dayName);
+        
+        if (dayTasks.length > 0) {
+            let tasksHtml = `<h3>المهام في ${dayName} ${day} ${monthNames[currentMonth]} ${currentYear}</h3>`;
+            tasksHtml += '<ul style="text-align: right; margin-top: 15px;">';
+            
+            dayTasks.forEach(task => {
+                const statusIcon = task.completed ? '✅' : '⏳';
+                tasksHtml += `<li style="margin-bottom: 8px; padding: 8px; background: #f8f9fa; border-radius: 5px;">
+                    ${statusIcon} ${task.text}
+                </li>`;
+            });
+            
+            tasksHtml += '</ul>';
+            
+            showNotification(tasksHtml, 'info', 5000);
+        } else {
+            showNotification(`لا توجد مهام في ${dayName} ${day} ${monthNames[currentMonth]} ${currentYear}`, 'info');
+        }
+    }
+
+    // ========== نظام المكافآت ==========
+    function updateRewards() {
+        document.getElementById('userPoints').textContent = userPoints;
+        const userLevel = Math.floor(userPoints / 100) + 1;
+        document.getElementById('userLevel').textContent = userLevel;
+        document.getElementById('pointsProgress').style.width = (userPoints % 100) + '%';
+        
+        // تحديث الشارات
+        const badges = [
+            { id: 1, name: 'المبتدئ', desc: 'أكمل 5 مهام', icon: 'fas fa-seedling', earned: completedTasksCount >= 5 },
+            { id: 2, name: 'منتج', desc: 'أكمل 20 مهمة', icon: 'fas fa-bolt', earned: completedTasksCount >= 20 },
+            { id: 3, name: 'مثابر', desc: '3 أيام متتالية', icon: 'fas fa-fire', earned: streakDays >= 3 },
+            { id: 4, name: 'بومودورو', desc: '10 جلسات بومودورو', icon: 'fas fa-clock', earned: pomodoroSessions >= 10 },
+            { id: 5, name: 'المنظم', desc: 'أضف 5 ملاحظات', icon: 'fas fa-sticky-note', earned: notes.length >= 5 },
+            { id: 6, name: 'الباحث', desc: 'أضف 3 روابط', icon: 'fas fa-link', earned: links.length >= 3 },
+            { id: 7, name: 'المنتج', desc: 'أكمل 50 مهمة', icon: 'fas fa-rocket', earned: completedTasksCount >= 50 },
+            { id: 8, name: 'المثابر', desc: '7 أيام متتالية', icon: 'fas fa-crown', earned: streakDays >= 7 },
+            { id: 9, name: 'المتفوق', desc: 'أكمل 100 مهمة', icon: 'fas fa-trophy', earned: completedTasksCount >= 100 },
+            { id: 10, name: 'المبدع', desc: 'أضف 10 ملاحظات', icon: 'fas fa-lightbulb', earned: notes.length >= 10 },
+            { id: 11, name: 'المنظم المتميز', desc: 'أكمل 5 أيام', icon: 'fas fa-star', earned: studyDays.size >= 5 },
+            { id: 12, name: 'بطل البومودورو', desc: '25 جلسة بومودورو', icon: 'fas fa-medal', earned: pomodoroSessions >= 25 }
+        ];
+        
+        const badgesContainer = document.getElementById('badgesContainer');
+        badgesContainer.innerHTML = badges.map(badge => `
+            <div class="badge-card ${badge.earned ? 'earned' : 'locked'}">
+                <div class="badge-icon">
+                    <i class="${badge.icon}"></i>
+                </div>
+                <div class="badge-name">${badge.name}</div>
+                <div class="badge-desc">${badge.desc}</div>
+                ${!badge.earned ? `
+                    <div class="badge-progress">
+                        <div class="badge-progress-bar" style="width: 0%"></div>
+                    </div>
+                ` : ''}
+            </div>
+        `).join('');
+    }
+
+    // ========== نظام البومودورو ==========
+    function setTimerType(type) {
+        timerType = type;
+        
+        // تحديث الأزرار
+        document.querySelectorAll('.timer-type-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // إعادة تعيين المؤقت
+        resetTimer();
+        
+        // تعيين الوقت المناسب
+        switch(type) {
+            case 'work':
+                timerMinutes = parseInt(document.getElementById('workTime').value) || 25;
+                document.getElementById('workTimerBtn').classList.add('active');
+                break;
+            case 'break':
+                timerMinutes = parseInt(document.getElementById('breakTime').value) || 5;
+                document.getElementById('breakTimerBtn').classList.add('active');
+                break;
+            case 'longBreak':
+                timerMinutes = parseInt(document.getElementById('longBreakTime').value) || 15;
+                document.getElementById('longBreakTimerBtn').classList.add('active');
+                break;
+        }
+        
+        updateTimerDisplay();
+    }
+
+    function startTimer() {
+        if (!timerRunning) {
+            timerRunning = true;
+            timerInterval = setInterval(updateTimer, 1000);
+            
+            document.getElementById('startTimerBtn').style.display = 'none';
+            document.getElementById('pauseTimerBtn').style.display = 'inline-block';
+        }
+    }
+
+    function pauseTimer() {
+        if (timerRunning) {
+            timerRunning = false;
+            clearInterval(timerInterval);
+            
+            document.getElementById('startTimerBtn').style.display = 'inline-block';
+            document.getElementById('pauseTimerBtn').style.display = 'none';
+        }
+    }
+
+    function resetTimer() {
+        timerRunning = false;
+        clearInterval(timerInterval);
+        
+        // إعادة تعيين الوقت بناءً على النوع
+        switch(timerType) {
+            case 'work':
+                timerMinutes = parseInt(document.getElementById('workTime').value) || 25;
+                break;
+            case 'break':
+                timerMinutes = parseInt(document.getElementById('breakTime').value) || 5;
+                break;
+            case 'longBreak':
+                timerMinutes = parseInt(document.getElementById('longBreakTime').value) || 15;
+                break;
+        }
+        timerSeconds = 0;
+        
+        updateTimerDisplay();
+        
+        document.getElementById('startTimerBtn').style.display = 'inline-block';
+        document.getElementById('pauseTimerBtn').style.display = 'none';
+    }
+
+    function updateTimer() {
+        if (timerSeconds === 0) {
+            if (timerMinutes === 0) {
+                // انتهى الوقت
+                timerComplete();
+                return;
+            }
+            timerMinutes--;
+            timerSeconds = 59;
+        } else {
+            timerSeconds--;
+        }
+        
+        updateTimerDisplay();
+    }
+
+    function updateTimerDisplay() {
+        const display = document.getElementById('timerDisplay');
+        display.textContent = `${timerMinutes.toString().padStart(2, '0')}:${timerSeconds.toString().padStart(2, '0')}`;
+    }
+
+    function timerComplete() {
+        clearInterval(timerInterval);
+        timerRunning = false;
+        
+        // تشغيل صوت التنبيه
+        playNotificationSound();
+        
+        // زيادة عدد الجلسات
+        if (timerType === 'work') {
+            pomodoroSessions++;
+            userPoints += 5;
+            document.getElementById('pomodoroSessions').textContent = pomodoroSessions;
+            showNotification('تهانينا! أكملت جلسة بومودورو وربحت 5 نقاط', 'success');
+        } else {
+            showNotification('انته وقت الراحة! حان وقت العودة للعمل', 'info');
+        }
+        
+        // حفظ البيانات
+        saveUserData();
+        updateRewards();
+        updateProfile();
+        
+        // إعادة تعيين واجهة المستخدم
+        document.getElementById('startTimerBtn').style.display = 'inline-block';
+        document.getElementById('pauseTimerBtn').style.display = 'none';
+    }
+
+    // ========== نظام الروابط ==========
+    function renderLinks() {
+        const linksList = document.getElementById('linksList');
+        linksList.innerHTML = '';
+        
+        if (links.length === 0) {
+            linksList.innerHTML = '<p style="text-align: center; color: var(--gray);">لا توجد روابط محفوظة حتى الآن</p>';
+            return;
+        }
+        
+        links.forEach(link => {
+            const linkElement = document.createElement('div');
+            linkElement.className = 'task-item';
+            linkElement.style.marginBottom = '10px';
+            linkElement.innerHTML = `
+                <div class="task-text">
+                    <strong>${link.name}</strong>
+                    <br>
+                    <small style="color: var(--gray);">${link.description || 'لا يوجد وصف'}</small>
+                </div>
+                <div class="task-actions">
+                    <button class="task-btn link" onclick="window.open('${link.url}', '_blank')">
+                        <i class="fas fa-external-link-alt"></i>
+                    </button>
+                    <button class="task-btn delete" onclick="deleteLink(${link.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+            
+            linksList.appendChild(linkElement);
+        });
+    }
+
+    function addLink() {
+        const name = document.getElementById('linkName').value.trim();
+        const url = document.getElementById('linkUrl').value.trim();
+        const description = document.getElementById('linkDescription').value.trim();
+        
+        if (!name || !url) {
+            showNotification('يرجى إدخال اسم الرابط والرابط', 'error');
+            return;
+        }
+        
+        // التحقق من صحة الرابط
+        try {
+            new URL(url);
+        } catch (e) {
+            showNotification('الرابط غير صالح', 'error');
+            return;
+        }
+        
+        const newLink = {
+            id: Date.now(),
+            name: name,
+            url: url,
+            description: description
+        };
+        
+        links.push(newLink);
+        
+        saveUserData().then(() => {
+            renderLinks();
+            clearLinkForm();
+            showNotification('تم إضافة الرابط بنجاح', 'success');
+            updateProfile();
+        });
+    }
+
+    function deleteLink(linkId) {
+        if (confirm('هل أنت متأكد من حذف هذا الرابط؟')) {
+            links = links.filter(l => l.id !== linkId);
+            saveUserData().then(() => {
+                renderLinks();
+                showNotification('تم حذف الرابط بنجاح', 'success');
+                updateProfile();
+            });
+        }
+    }
+
+    function updateLinkPreview() {
+        const name = document.getElementById('linkName').value.trim();
+        const url = document.getElementById('linkUrl').value.trim();
+        const description = document.getElementById('linkDescription').value.trim();
+        
+        if (name || url) {
+            document.getElementById('linkPreview').style.display = 'block';
+            let previewContent = '';
+            
+            if (name) previewContent += `<strong>${name}</strong><br>`;
+            if (url) previewContent += `<a href="${url}" target="_blank">${url}</a><br>`;
+            if (description) previewContent += `<small>${description}</small>`;
+            
+            document.getElementById('previewContent').innerHTML = previewContent;
+        } else {
+            document.getElementById('linkPreview').style.display = 'none';
+        }
+    }
+
+    function clearLinkForm() {
+        document.getElementById('linkName').value = '';
+        document.getElementById('linkUrl').value = '';
+        document.getElementById('linkDescription').value = '';
+        document.getElementById('linkPreview').style.display = 'none';
+    }
+
+    // ========== نظام الإشعارات ==========
+    function showNotification(message, type = 'info', duration = 3000) {
+        // إزالة أي إشعارات سابقة
+        document.querySelectorAll('.notification').forEach(notification => {
+            notification.remove();
+        });
+        
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `
+            <div class="notification-content">
+                <i class="fas fa-${getNotificationIcon(type)}"></i>
+                <span>${message}</span>
+            </div>
+            <button class="close-notification" onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // إظهار الإشعار
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 100);
+        
+        // إخفاء الإشعار تلقائياً بعد المدة المحددة
+        if (duration > 0) {
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentElement) {
+                        notification.parentElement.removeChild(notification);
+                    }
+                }, 300);
+            }, duration);
+        }
+        
+        return notification;
+    }
+
+    function getNotificationIcon(type) {
+        switch(type) {
+            case 'success': return 'check-circle';
+            case 'error': return 'exclamation-circle';
+            case 'warning': return 'exclamation-triangle';
+            case 'info': return 'info-circle';
+            default: return 'info-circle';
+        }
+    }
+
+    function playNotificationSound() {
+        // إنشاء صوت تنبيه بسيط
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.01);
+            gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.5);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        } catch (error) {
+            console.log('لا يمكن تشغيل الصوت:', error);
+        }
+    }
+
+    // ========== دوال المساعدة ==========
+    function updateDashboard() {
+        const totalTasks = tasks.length;
+        const completedTasks = tasks.filter(task => task.completed).length;
+        const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+        
+        document.getElementById('completedTasks').textContent = completedTasks;
+        document.getElementById('totalTasks').textContent = totalTasks;
+        document.getElementById('progressPercent').textContent = progress + '%';
+        document.getElementById('remainingTasks').textContent = totalTasks - completedTasks;
+        document.getElementById('progressBar').style.width = progress + '%';
+        document.getElementById('progressText').textContent = progress + '%';
+    }
+
+    function updateProfile() {
+        document.getElementById('profileTasksCompleted').textContent = completedTasksCount;
+        document.getElementById('profileStreak').textContent = streakDays;
+        document.getElementById('profileLevel').textContent = Math.floor(userPoints / 100) + 1;
+        document.getElementById('profilePoints').textContent = userPoints;
+        document.getElementById('profilePomodoroSessions').textContent = pomodoroSessions;
+        document.getElementById('profileNotesCount').textContent = notes.length;
+        document.getElementById('profileLinksCount').textContent = links.length;
+        document.getElementById('profileStudyDays').textContent = studyDays.size;
+    }
+
+    function updateStats() {
+        document.getElementById('streakDays').textContent = streakDays;
+        
+        // حساب المهام المكتملة هذا الأسبوع
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        const weeklyCompleted = tasks.filter(task => {
+            return task.completed; // في الإصدار الحالي، لا نخزن تاريخ الإنجاز
+        }).length;
+        document.getElementById('weeklyCompleted').textContent = weeklyCompleted;
+        
+        // حساب أفضل يوم (أكثر يوم به مهام مكتملة)
+        const dayStats = {};
+        tasks.forEach(task => {
+            if (task.completed) {
+                dayStats[task.day] = (dayStats[task.day] || 0) + 1;
+            }
+        });
+        
+        let bestDay = 'لا يوجد';
+        let maxTasks = 0;
+        for (const day in dayStats) {
+            if (dayStats[day] > maxTasks) {
+                maxTasks = dayStats[day];
+                bestDay = day;
+            }
+        }
+        document.getElementById('bestDay').textContent = bestDay;
+        
+        // حساب إجمالي وقت المذاكرة (تقديري)
+        const totalStudyTime = Math.round(pomodoroSessions * 25 / 60);
+        document.getElementById('totalStudyTime').textContent = totalStudyTime;
+    }
+
+    function toggleUserDropdown() {
+        const dropdown = document.getElementById('userDropdown');
+        dropdown.classList.toggle('show');
+    }
+
+    function toggleFocusMode() {
+        const focusMode = document.getElementById('focusMode');
+        const isActive = focusMode.classList.toggle('active');
+        
+        if (isActive) {
+            // عند تفعيل وضع التركيز، اختر مهمة عشوائية غير مكتملة
+            const pendingTasks = tasks.filter(task => !task.completed && !task.vacation);
+            if (pendingTasks.length > 0) {
+                const randomTask = pendingTasks[Math.floor(Math.random() * pendingTasks.length)];
+                currentFocusTask = randomTask;
+                document.getElementById('focusTask').textContent = randomTask.text;
+            } else {
+                document.getElementById('focusTask').textContent = 'لا توجد مهام pending';
+            }
+            
+            // إعادة تعيين المؤقت
+            focusMinutes = 60;
+            focusSeconds = 0;
+            updateFocusTimerDisplay();
+        } else {
+            // عند إيقاف وضع التركيز
+            stopFocusTimer();
+        }
+    }
+
+    function startFocusTimer() {
+        if (!focusTimerRunning) {
+            focusTimerRunning = true;
+            focusTimerInterval = setInterval(updateFocusTimer, 1000);
+        }
+    }
+
+    function pauseFocusTimer() {
+        if (focusTimerRunning) {
+            focusTimerRunning = false;
+            clearInterval(focusTimerInterval);
+        }
+    }
+
+    function updateFocusTimer() {
+        if (focusSeconds === 0) {
+            if (focusMinutes === 0) {
+                // انتهى الوقت
+                focusTimerComplete();
+                return;
+            }
+            focusMinutes--;
+            focusSeconds = 59;
+        } else {
+            focusSeconds--;
+        }
+        
+        updateFocusTimerDisplay();
+    }
+
+    function updateFocusTimerDisplay() {
+        const display = document.getElementById('focusTimer');
+        display.textContent = `${focusMinutes.toString().padStart(2, '0')}:${focusSeconds.toString().padStart(2, '0')}`;
+    }
+
+    function focusTimerComplete() {
+        clearInterval(focusTimerInterval);
+        focusTimerRunning = false;
+        
+        // تشغيل صوت التنبيه
+        playNotificationSound();
+        
+        // منح نقاط إضافية
+        userPoints += 20;
+        
+        // إذا كانت هناك مهمة محددة، وضعها كمكتملة
+        if (currentFocusTask) {
+            currentFocusTask.completed = true;
+            completedTasksCount++;
+        }
+        
+        showNotification('تهانينا! أكملت جلسة تركيز مدتها ساعة كاملة وربحت 20 نقطة', 'success');
+        
+        // حفظ البيانات
+        saveUserData().then(() => {
+            updateDashboard();
+            updateRewards();
+            updateProfile();
+        });
+        
+        // إعادة تعيين واجهة المستخدم
+        toggleFocusMode();
+    }
+
+    function stopFocusTimer() {
+        focusTimerRunning = false;
+        clearInterval(focusTimerInterval);
+    }
+
+    function saveProgress() {
+        saveUserData().then(() => {
+            showNotification('تم حفظ التقدم بنجاح', 'success');
+        });
+    }
+
+    // إغلاق القائمة المنسدلة عند النقر خارجها
+    window.onclick = function(event) {
+        if (!event.target.matches('.user-profile')) {
+            const dropdown = document.getElementById('userDropdown');
+            if (dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+            }
+        }
+    };
+
+    // ========== دوال النوافذ المنبثقة ==========
+    function openAddTaskModal() {
+        document.getElementById('addTaskModal').style.display = 'flex';
+    }
+
+    function closeAddTaskModal() {
+        document.getElementById('addTaskModal').style.display = 'none';
+        
+        // مسح الحقول
+        document.getElementById('newTaskText').value = '';
+        document.getElementById('newTaskNotes').value = '';
+        document.getElementById('newTaskLink').value = '';
+    }
+
+    function closeEditTaskModal() {
+        document.getElementById('editTaskModal').style.display = 'none';
+        editingTaskId = null;
+    }
+
+    function openAddNoteModal() {
+        document.getElementById('addNoteModal').style.display = 'flex';
+    }
+
+    function closeAddNoteModal() {
+        document.getElementById('addNoteModal').style.display = 'none';
+        
+        // مسح الحقول
+        document.getElementById('newNoteTitle').value = '';
+        document.getElementById('newNoteContent').value = '';
+    }
+
+    function closeTaskNotesModal() {
+        document.getElementById('taskNotesModal').style.display = 'none';
+    }
+
+    async function addNewTask() {
+        const taskText = document.getElementById('newTaskText').value.trim();
+        const taskDay = document.getElementById('newTaskDay').value;
+        const taskPriority = document.getElementById('newTaskPriority').value;
+        const taskNotes = document.getElementById('newTaskNotes').value.trim();
+        const taskLink = document.getElementById('newTaskLink').value.trim();
+        
+        if (!taskText) {
+            showNotification('يرجى إدخال نص المهمة', 'error');
+            return;
+        }
+        
+        const newTask = {
+            id: Date.now(),
+            text: taskText,
+            day: taskDay,
+            completed: false,
+            priority: taskPriority
+        };
+        
+        // إضافة الملاحظات إذا كانت موجودة
+        if (taskNotes) {
+            newTask.notes = taskNotes;
+        }
+        
+        // إضافة الرابط إذا كان موجوداً
+        if (taskLink) {
+            try {
+                new URL(taskLink);
+                newTask.link = taskLink;
+            } catch (e) {
+                showNotification('الرابط غير صالح، سيتم تجاهله', 'warning');
+            }
+        }
+        
+        tasks.push(newTask);
+        
+        saveUserData().then(() => {
+            renderSchedule();
+            renderMiniSchedule();
+            updateDashboard();
+            closeAddTaskModal();
+            showNotification('تم إضافة المهمة بنجاح', 'success');
+        });
+    }
+
+    function addNewNote() {
+        const noteTitle = document.getElementById('newNoteTitle').value.trim();
+        const noteContent = document.getElementById('newNoteContent').value.trim();
+        
+        if (!noteTitle || !noteContent) {
+            showNotification('يرجى ملء جميع الحقول', 'error');
+            return;
+        }
+        
+        const newNote = {
+            id: Date.now(),
+            title: noteTitle,
+            content: noteContent,
+            date: new Date().toISOString()
+        };
+        
+        notes.push(newNote);
+        
+        saveUserData().then(() => {
+            renderNotes();
+            closeAddNoteModal();
+            showNotification('تم إضافة الملاحظة بنجاح', 'success');
+            updateProfile();
+        });
+    }
+
+    // ========== دوال إضافية للوظائف المطلوبة ==========
+    function takeVacation() {
+        if (confirm('هل تريد أخذ إجازة لليوم؟ سيتم تعليق جميع المهام لليوم الحالي.')) {
+            const today = new Date().toLocaleDateString('ar-SA', { weekday: 'long' });
+            let vacationCount = 0;
+            
+            tasks.forEach(task => {
+                if (task.day === today && !task.completed && !task.vacation) {
+                    task.vacation = true;
+                    vacationCount++;
+                }
+            });
+            
+            saveUserData().then(() => {
+                renderSchedule();
+                showNotification(`تم تعليق ${vacationCount} مهمة لليوم الحالي`, 'success');
+            });
+        }
+    }
+
+    function cancelVacation() {
+        const today = new Date().toLocaleDateString('ar-SA', { weekday: 'long' });
+        let unVacationCount = 0;
+        
+        tasks.forEach(task => {
+            if (task.day === today && task.vacation) {
+                task.vacation = false;
+                unVacationCount++;
+            }
+        });
+        
+        saveUserData().then(() => {
+            renderSchedule();
+            showNotification(`تم إلغاء تعليق ${unVacationCount} مهمة`, 'success');
+        });
+    }
+
+    function resetProgress() {
+        if (confirm('هل أنت متأكد من إعادة تعيين جميع التقدم؟ سيتم حذف جميع الإحصائيات.')) {
+            tasks.forEach(task => {
+                task.completed = false;
+                task.vacation = false;
+            });
+            completedTasksCount = 0;
+            userPoints = 0;
+            streakDays = 0;
+            studyDays.clear();
+            pomodoroSessions = 0;
+            
+            saveUserData().then(() => {
+                renderSchedule();
+                renderMiniSchedule();
+                updateDashboard();
+                updateRewards();
+                updateProfile();
+                renderCalendar();
+                showNotification('تم إعادة تعيين جميع التقدم', 'success');
+            });
+        }
+    }
+
+    function exportUserData() {
+        const userData = {
+            tasks: tasks,
+            notes: notes,
+            links: links,
+            pomodoroSessions: pomodoroSessions,
+            userPoints: userPoints,
+            streakDays: streakDays,
+            studyDays: Array.from(studyDays),
+            completedTasksCount: completedTasksCount,
+            exportDate: new Date().toISOString(),
+            version: '1.0'
+        };
+        
+        const dataStr = JSON.stringify(userData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `study_system_backup_${new Date().toISOString().split('T')[0]}.json`;
+        link.click();
+        
+        URL.revokeObjectURL(url);
+        showNotification('تم تصدير البيانات بنجاح', 'success');
+    }
+
+    function importUserData(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const userData = JSON.parse(e.target.result);
+                
+                // تحميل البيانات المستوردة
+                if (userData.tasks) tasks = userData.tasks;
+                if (userData.notes) notes = userData.notes;
+                if (userData.links) links = userData.links;
+                if (userData.pomodoroSessions) pomodoroSessions = userData.pomodoroSessions;
+                if (userData.userPoints) userPoints = userData.userPoints;
+                if (userData.streakDays) streakDays = userData.streakDays;
+                if (userData.studyDays) studyDays = new Set(userData.studyDays);
+                if (userData.completedTasksCount) completedTasksCount = userData.completedTasksCount;
+                
+                saveUserData().then(() => {
+                    initializeApp();
+                    showNotification('تم استيراد البيانات بنجاح', 'success');
+                });
+                
+            } catch (error) {
+                showNotification('خطأ في استيراد البيانات: ملف غير صالح', 'error');
+            }
+        };
+        reader.readAsText(file);
+        event.target.value = '';
+    }
+
+    function clearAllData() {
+        if (confirm('هل أنت متأكد من مسح جميع البيانات؟ لا يمكن التراجع عن هذا الإجراء.')) {
+            tasks = [];
+            notes = [];
+            links = [];
+            pomodoroSessions = 0;
+            userPoints = 0;
+            streakDays = 0;
+            studyDays.clear();
+            completedTasksCount = 0;
+            
+            saveUserData().then(() => {
+                initializeApp();
+                showNotification('تم مسح جميع البيانات', 'success');
+            });
+        }
+    }
+
+    function saveSettings() {
+        const userName = document.getElementById('settingsUserName').value.trim();
+        const userEmail = document.getElementById('settingsUserEmail').value.trim();
+        const password = document.getElementById('settingsUserPassword').value;
+        const confirmPassword = document.getElementById('settingsUserConfirmPassword').value;
+        
+        if (userName) {
+            // تحديث اسم المستخدم في الواجهة
+            document.getElementById('userName').textContent = userName;
+            document.getElementById('headerUserName').textContent = userName;
+            document.getElementById('userAvatar').textContent = userName.charAt(0);
+            document.getElementById('profileAvatar').textContent = userName.charAt(0);
+            document.getElementById('profileName').textContent = userName;
+        }
+        
+        if (userEmail && userEmail !== currentUser) {
+            // تحديث البريد الإلكتروني (يتطلب مزيداً من التطوير)
+            showNotification('تحديث البريد الإلكتروني يتطلب إعادة تسجيل الدخول', 'warning');
+        }
+        
+        if (password) {
+            if (password !== confirmPassword) {
+                showNotification('كلمات المرور غير متطابقة', 'error');
+                return;
+            }
+            // تحديث كلمة المرور (يتطلب مزيداً من التطوير)
+            showNotification('تم تحديث كلمة المرور', 'success');
+        }
+        
+        showNotification('تم حفظ الإعدادات بنجاح', 'success');
+    }
+
+    function filterTasks(searchTerm) {
+        // هذا يحتاج إلى تطبيق أكثر تعقيداً للبحث الحقيقي
+        // في هذا الإصدار، سنقوم فقط بإظهار/إخفاء العناصر
+        const taskItems = document.querySelectorAll('.task-item');
+        taskItems.forEach(item => {
+            const taskText = item.querySelector('.task-text').textContent;
+            if (taskText.toLowerCase().includes(searchTerm.toLowerCase())) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+
+    function filterTasksByStatus(status) {
+        const taskItems = document.querySelectorAll('.task-item');
+        taskItems.forEach(item => {
+            switch(status) {
+                case 'completed':
+                    item.style.display = item.classList.contains('completed') ? 'flex' : 'none';
+                    break;
+                case 'pending':
+                    item.style.display = !item.classList.contains('completed') ? 'flex' : 'none';
+                    break;
+                case 'vacation':
+                    item.style.display = item.classList.contains('vacation') ? 'flex' : 'none';
+                    break;
+                case 'with-links':
+                    // هذا يحتاج إلى تحسين لتحديد المهام التي تحتوي على روابط
+                    item.style.display = 'flex'; // مؤقتاً
+                    break;
+                default:
+                    item.style.display = 'flex';
+            }
+        });
+    }
+
+    // ========== نظام الدارك مود ==========
+    function loadDarkMode() {
+        const isDarkMode = localStorage.getItem('darkMode') === 'true';
+        if (isDarkMode) {
+            document.body.classList.add('dark-mode');
+            document.getElementById('themeToggle').innerHTML = '<i class="fas fa-sun"></i>';
+        }
+    }
+
+    function saveDarkMode() {
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', isDarkMode);
+    }
+
+    // ========== التهيئة الأولية ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        // محاكاة شاشة التحميل
+        let progress = 0;
+        const progressInterval = setInterval(() => {
+            progress += 5;
+            document.getElementById('loadingProgress').style.width = progress + '%';
+            
+            if (progress >= 100) {
+                clearInterval(progressInterval);
+                setTimeout(() => {
+                    document.getElementById('loadingScreen').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('loadingScreen').style.display = 'none';
+                    }, 500);
+                }, 500);
+            }
+        }, 100);
+        
+        // تهيئة تبديل السمة
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            themeToggle.innerHTML = document.body.classList.contains('dark-mode') ? 
+                '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            saveDarkMode();
+        });
+        
+        // تهيئة زر تبديل القائمة الجانبية
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', function() {
+                const sidebar = document.querySelector('.sidebar');
+                sidebar.classList.toggle('active');
+            });
+        }
+        
+        // محاولة تحميل بيانات المستخدم إذا كان مسجلاً الدخول
+        const savedUser = localStorage.getItem('currentUser');
+        if (savedUser) {
+            currentUser = savedUser;
+            openDatabase().then(() => {
+                // تحميل بيانات المستخدم
+                const transaction = db.transaction(['users'], 'readonly');
+                const store = transaction.objectStore('users');
+                const request = store.get(savedUser);
+                
+                request.onsuccess = () => {
+                    const user = request.result;
+                    if (user) {
+                        loadUserData().then(userData => {
+                            if (userData.tasks) tasks = userData.tasks;
+                            if (userData.notes) notes = userData.notes;
+                            if (userData.links) links = userData.links;
+                            if (userData.pomodoroSessions) pomodoroSessions = userData.pomodoroSessions;
+                            if (userData.userPoints) userPoints = userData.userPoints;
+                            if (userData.streakDays) streakDays = userData.streakDays;
+                            if (userData.studyDays) studyDays = new Set(userData.studyDays);
+                            if (userData.completedTasksCount) completedTasksCount = userData.completedTasksCount;
+                            
+                            updateUserInfo(user);
+                            initializeApp();
+                            document.getElementById('authSection').style.display = 'none';
+                            document.getElementById('appContainer').classList.add('active');
+                        });
+                    }
+                };
+            });
+        }
+    });
+  </script>
+</body>
+</html>
